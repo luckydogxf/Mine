@@ -40,4 +40,4 @@ would show the command to join a worker node.
 ```
 4. change logs
 
-Bump version to `1.24.3`. Removed `docker` and enable `containerd` as default.
+Bump version to `1.24.3`. Remove `docker` and enable `containerd` as default.
