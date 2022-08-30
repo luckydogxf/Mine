@@ -1,4 +1,6 @@
-  可以创建AWS/openstack/Azure等，一个开源的云平台管理工具，假如你用了Azure/openstack等混杂云环境，可以考虑用这个，官方文档非常的简洁。下边例子是创建VPC/subnet/若干个EC2，后端的subnet的ec2通过nat-box上网并且安装puppet/zabbix的yum repo。不多说了，talk is cheap, show me the code.
+  可以创建AWS/openstack/Azure等，一个开源的云平台管理工具，假如你用了Azure/openstack等混杂云环境，可以考虑用这个，官方文档非常的简洁。下边例子是创建VPC/subnet/若干个EC2，后端的subnet的ec2通过nat-box上网并且安装puppet/zabbix的yum repo。不多说了，
+  
+  ```talk is cheap, show me the code.```
   
   注意provisioner有个问题：创建EIP和remote-exec, 由于remote-exec需要EIP,但terraform会等remote-exec执行完才得到eip，这显然是不可能的，需要depends_on来指定先后顺序和用null_resource, 这这里也有说明。
   
