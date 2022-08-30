@@ -1,15 +1,18 @@
+.  CloudFormation 官方啰嗦一大堆，其实就是根据amazon提供的API和规则编写json文件（stack)来实现自动创建各种资源如vpc/ec2/rds等。然后实现 infrastcture as code，
+    就是把基础设施用code来实现，当然这是在云时代才可行的哦。BTW, 阿里云也推出了类似的工具叫资源编排(名字好奇怪啊），几乎是个拷贝，估计是方便AWS用户迁移到阿里云上吧，
+    兼容性极好，学习起来也是零成本。
+ . 好处：非常的方便，当然也包括删除资源，除非你后来手工做了改动比如加了某个Instance到自动创建的subnet,此时delete会报错（有依赖关系），不过当你手动删掉你之前手工创建
+    的资源后，再次删除delete stack就可以了。建议既然用CF了，就不要人工的去做了。
 
-    .  CloudFormation 官方啰嗦一大堆，其实就是根据amazon提供的API和规则编写json文件（stack)来实现自动创建各种资源如vpc/ec2/rds等。然后实现 infrastcture as code，就是把基础设施用code来实现，当然这是在云时代才可行的哦。BTW, 阿里云也推出了类似的工具叫资源编排(名字好奇怪啊），几乎是个拷贝，估计是方便AWS用户迁移到阿里云上吧，兼容性极好，学习起来也是零成本。
+. 所有的stack在console能实现的，都有对应的命令行工具。
 
-    . 好处：非常的方便，当然也包括删除资源，除非你后来手工做了改动比如加了某个Instance到自动创建的subnet,此时delete会报错（有依赖关系），不过当你手动删掉你之前手工创建的资源后，再次删除delete stack就可以了。建议既然用CF了，就不要人工的去做了。
+. 当你创建了stack policy的时候某些资源做了限制。只有满足条件才能update等。
 
-    . 所有的stack在console能实现的，都有对应的命令行工具。
+. changeset: 当stack执行完毕，若update,此时无需删除stack重来，只需修改tempalte,然后创建changset后执行即可，比如修改instance的type。但可能会造成中断等。
 
-    . 当你创建了stack policy的时候某些资源做了限制。只有满足条件才能update等。
+. stack分组，比如website/database,这样不影响，然后nested stack，比如把loadbalancer单独当做一个stack.如下:
 
-    . changeset: 当stack执行完毕，若update,此时无需删除stack重来，只需修改tempalte,然后创建changset后执行即可，比如修改instance的type。但可能会造成中断等。
-
-    . stack分组，比如website/database,这样不影响，然后nested stack，比如把loadbalancer单独当做一个stack.如下
+    
 ```
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
@@ -1587,7 +1590,7 @@ EC2/Auto Scaling建议使用。还有个waitcondition跟这个类似，但具体
         }
     }
 }
-以下是跟DNS操作有观的，未验证，因为route53我没用到，拷贝为了参考备忘。
+以下是跟DNS操作有关的，未验证，因为route53我没用到，拷贝为了参考备忘。
 "HostedZone": {
             "Type": "AWS::Route53::HostedZone",
             "Properties": {
