@@ -10,7 +10,7 @@
     . changeset: 当stack执行完毕，若update,此时无需删除stack重来，只需修改tempalte,然后创建changset后执行即可，比如修改instance的type。但可能会造成中断等。
 
     . stack分组，比如website/database,这样不影响，然后nested stack，比如把loadbalancer单独当做一个stack.如下
-
+```
 {
     "AWSTemplateFormatVersion" : "2010-09-09",
     "Resources" : {
@@ -26,8 +26,9 @@
         }
     }
 }
-
+```
 ##########  一个stack的大致结构  ########################
+```
 {
   "AWSTemplateFormatVersion" : "version date",
 
@@ -57,9 +58,10 @@
     set of outputs
   }
 }
+```
 
-
-例1:
+. 例1:
+```
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
   "Parameters" : {
@@ -105,16 +107,16 @@
     }
   }
 }
-
+```
 
 故障排除：
 
 用aws cli的时候需要传递一个list，需要转义
 
-ParameterKey=CIDR,ParameterValue='10.10.0.0/16\,10.10.0.0/24\,10.10.1.0/24'
+```ParameterKey=CIDR,ParameterValue='10.10.0.0/16\,10.10.0.0/24\,10.10.1.0/24'```
 
 现在附上我写的一个,本意是创建一个vpc/2 subnets，若干securitygroup,internet gateway, route table。然后一个opsman和nat box这2个instance在public subnet, private subnet的通过nat box上网，还有ELB等资源。当然我添加了若干注释是没用到的，仅仅是为了做笔记，实际上json不允许有任何注释。
-
+```
 
 {
     "AWSTemplateFormatVersion": "2010-09-09",
@@ -1678,4 +1680,4 @@ EC2/Auto Scaling建议使用。还有个waitcondition跟这个类似，但具体
                 ]
             }
         }
-
+```
