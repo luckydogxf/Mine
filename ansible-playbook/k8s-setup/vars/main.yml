@@ -1,0 +1,69 @@
+gpg_key:
+# k8s and docker
+  - https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  - https://download.docker.com/linux/ubuntu/gpg
+
+repos:
+  # keep it up-to-date.
+  - deb https://download.docker.com/linux/ubuntu   focal stable
+  - deb https://apt.kubernetes.io/ kubernetes-xenial main
+
+# need to remove them.
+old_pkgs:
+  - docker 
+  - docker-engine 
+  - "docker.io"
+  - containerd 
+  - runc
+
+# need to install them.
+new_pkgs:
+  - kubeadm=1.24.3-00
+  - kubectl=1.24.3-00
+  - ca-certificates
+  - curl
+  - gnupg 
+  - lsb-release
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  # No longer used.
+  #- docker-ce
+  #- docker-ce-cli
+  - "containerd.io"
+  - docker-compose-plugin
+  - ipvsadm
+  - conntrack
+  - kubelet=1.24.3-00
+
+file_target:
+  - source: config.toml
+    dest: /etc/containerd/
+
+  - source: hosts.toml
+    dest: /etc/containerd/certs.d/pt/
+
+  - source: k8s.conf
+    dest: /etc/sysctl.d/90-k8s.conf
+ 
+  - source: k8s-mod.conf
+    dest: /etc/modules-load.d/k8s.conf
+
+  - source: containerd.service
+    dest: /usr/lib/systemd/system/containerd.service
+  # update grub to add 'systemd.unified_cgroup_hierarchy=1'
+  # cgroup v2 
+  - source: grub
+    dest: /etc/default/grub
+
+# docker pull image through proxy.
+#
+http_proxy: http://172.16.232.21:8088
+
+no_proxy:
+  - 10.96.0.0/12
+  - 172.16.232.0/21
+  - 172.16.215.0/24
+  - .pacific-textiles.com
+  - 10.244.0.0/16
+  - 127.0.0.1

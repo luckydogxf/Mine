@@ -1,0 +1,99 @@
+---
+- name: Add Docker and K8s GPG apt Key
+  apt_key:
+    url: "{{ item }}"
+    state: present
+  loop: "{{ gpg_key }}"
+
+- name: Add Docker and k8s Repository
+  apt_repository:
+    repo: "{{ item }}"
+    state: present
+  loop: "{{ repos }}"
+
+- name: remove old packages
+  package:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ old_pkgs }}"
+
+  # package may not exist, so we have to ignore errors.
+  ignore_errors: true
+
+- name: install packages
+  package:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  loop: "{{ new_pkgs }}"
+ 
+- name: load ipvs module to use ipvs for kube-proxy.
+  shell: >-
+    modprobe -- ip_vs
+    modprobe -- ip_vs_rr
+    modprobe -- ip_vs_wrr
+    modprobe -- ip_vs_sh
+    modprobe -- nf_conntrack
+    modprobe -- br_netfilter
+    modprobe -- overlay
+
+
+- name: Creates containerd Registry.
+  file:
+    path: /etc/containerd/certs.d/pt/
+    state: directory
+    mode: 0775
+    recurse: yes
+
+- name: sysctl.conf tweaks.
+  copy:
+    src: "{{ item.source }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+  loop: "{{ file_target }}"
+
+- name: enable sysclt.conf and reload containerd daemon
+  shell: >-
+    sysctl -p /etc/sysctl.d/90-k8s.conf; systemctl daemon-reload
+
+- name: update grub......
+  shell: >-
+    update-grub
+
+- name: create containerd http proxy.
+  template:
+    src: containerd.conf.j2
+    dest: /etc/default/containerd
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+
+- name: create containerd config
+  lineinfile:
+    create: yes
+    path:  /etc/crictl.yaml
+    line: 'runtime-endpoint: unix:///run/containerd/containerd.sock'
+    owner: root
+    group: root
+    mode: '0644'
+    backup: no
+
+- name: start and enable services
+  # should be `disabled` before join a cluster.
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: yes
+  loop: 
+    - containerd
+    - kubelet
+  
+- name: reboot this machine
+  # reboot it as we update grub and take if effective.
+  reboot:
+    reboot_timeout: 300
+

@@ -1,0 +1,56 @@
+---
+- name: Update root password
+  user: name=root password={{ new_password | password_hash('sha512') }} update_password=always
+  # Don't change it if password age is not exipred.
+
+- debug:
+    msg="{{ansible_default_ipv4.address}},root,{{new_password}},{{ansible_hostname}}"
+  
+- name: Record password
+  lineinfile:
+    dest: "{{role_path}}/files/password.csv"
+    #line: "{{ansible_default_ipv4.address}},{{new_password}}"
+    line: "{{ansible_default_ipv4.address}},root,{{new_password}},{{ansible_hostname}}"
+    create: yes
+  delegate_to: localhost
+
+- name: password verification.
+  remote_user: root
+  vars:
+    # access Host and group vars
+    # hostvars[GROUP_NAME].XXX
+    - ansible_ssh_pass: "{{hostvars[inventory_hostname]['new_password']}}"
+  command: echo ok
+
+- name: Send email to users
+  mail:
+    host: pycmapp.pacific-textiles.com
+    port: 465
+    username: "{{ email_username }}"
+    password: "{{ email_password }}"
+    from: "{{ email_username }}"
+    to: "{{ email_to }}"
+    #cc: xx@artisantechnologies.cn
+    attach: "{{role_path}}/files/password.csv"
+    subject: "{{ email_subject }}"
+    subtype: "{{ email_type }}"
+    body: "{{ email_body }}"
+    timeout: 60
+  delegate_to: localhost
+  run_once: true
+  when: 
+    # Once we walk through all inventory hosts, that index would be the size -1.
+    - ( ansible_play_hosts.index(inventory_hostname) + 1 == ansible_play_hosts |length )
+  register: res
+  # Unless this runs.
+  changed_when: yes
+
+- name: Delete csv file
+  file:
+    path: "{{role_path}}/files/password.csv"
+    state: absent
+  delegate_to: localhost
+  run_once: true
+  # we cannot use res.rc == 0 as its value is none when it's skipped.
+  # res is changed.etc
+  when: res is changed

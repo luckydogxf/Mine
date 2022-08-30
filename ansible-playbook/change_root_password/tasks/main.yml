@@ -1,0 +1,19 @@
+---
+- shell: >
+    passwd -S root |awk '/\//{split($3,a,"/");print a[3]"-"a[1]"-"a[2]}!/\//{print $3}'
+  register: rest
+
+- set_fact:
+    need_change: >-
+      {%- if((ansible_date_time.epoch | int ) - (((rest.stdout + " 00:00:00")|to_datetime).strftime('%s') | int ) ) > (86400*password_age) -%}
+        0
+      {%- else -%}
+         1
+      {%- endif -%}
+
+    new_password: "{{ lookup('password', '/dev/null length=' + password_length +' chars=' + password_type ) }}"
+
+- include_tasks: change.yml
+  # when/include only apply tasks itself.
+  # while import/when apply inside tasks.
+  when: need_change == '0'

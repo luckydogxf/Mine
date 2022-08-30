@@ -1,0 +1,6 @@
+server = "https://harbor.pacific-textiles.com"
+
+[host."https://harbor.pacific-textiles.com"]
+
+capabilities =  ["pull", "resolve", "push"]
+
