@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+''' 
+定期更新 Fortimail的 SSL 证书
+完全自动化
+'''
 import os,sys,pexpect,time
 
 fortimail = ['172.16.232.100']

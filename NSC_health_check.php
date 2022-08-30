@@ -1,5 +1,7 @@
 
-对后端的infobright做health check ,之简单的检查tcp 3306不够放心，毕竟好多情况下端口开启，但服务不正常。因此写了个php，思路是：通过自定义检查方式，在monitor里填写目的ip/port然后 "GET /xxx.php?server=xxx",首先检查端口是否alive，然后判断该机器是否是维护状态（人为的在database写入一个记录READ/WRITE)，最后返给Netscaler , NSC 根据这个判断该service是否正常。
+对后端的infobright做health check ,之简单的检查tcp 3306不够放心，毕竟好多情况下端口开启，但服务不正常。因此写了个php，思路是：通过自定义检查方式，
+在monitor里填写目的ip/port然后 "GET /xxx.php?server=xxx",首先检查端口是否alive，然后判断该机器是否是维护状态（人为的在database写入一个记录READ/WRITE)，
+最后返给Netscaler , NSC 根据这个判断该service是否正常。
 
 <?php
 
