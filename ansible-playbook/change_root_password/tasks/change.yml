@@ -24,13 +24,13 @@
 
 - name: Send email to users
   mail:
-    host: pycmapp.pacific-textiles.com
+    host: mail.xxx.com
     port: 465
     username: "{{ email_username }}"
     password: "{{ email_password }}"
     from: "{{ email_username }}"
     to: "{{ email_to }}"
-    #cc: xx@artisantechnologies.cn
+    #cc: xx@artogies.cn
     attach: "{{role_path}}/files/password.csv"
     subject: "{{ email_subject }}"
     subtype: "{{ email_type }}"
