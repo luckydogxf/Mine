@@ -1,4 +1,6 @@
-. 
+1. group_left的时候，一边有多个重复的metric. 例如利用`cephfs`的时候，就有这种情况，此时就会出错，用avg/min/max可以dedupicate。
+```
+
     - name: pod_disk_usage
       rules:
 
@@ -11,4 +13,11 @@
         annotations:
           summary: pod disk is full
           description: "Pod disk is full\nValue = {{ $value }}\nLabels = {{ $labels.env }}"
+```
 
+2. 某些metric只有特定条件下才有值，例如ceph OSD，只有down的时候，才会有值，那应该怎么处理呢？`vector(x)` 可以返回x
+
+```
+count(ceph_osd_up{app="$cluster"} ==0) OR vector(0)
+
+```
