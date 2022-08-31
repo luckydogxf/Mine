@@ -1,6 +1,13 @@
 1. group_left的时候，一边有多个重复的metric. 例如利用`cephfs`的时候，就有这种情况，此时就会出错，用avg/min/max可以dedupicate。
 ```
+{beta_kubernetes_io_arch="amd64", beta_kubernetes_io_os="linux", instance="k8s-master-2.pxx.com", job="kubernetes-nodes", kubernetes_io_arch="amd64", kubernetes_io_hostname="k8s-master-2.pxx.com", kubernetes_io_os="linux", namespace="default", persistentvolumeclaim="nextcloud-data"}
+...
+{beta_kubernetes_io_arch="amd64", beta_kubernetes_io_os="linux", instance="k8s-master-4.pxx.com", job="kubernetes-nodes", kubernetes_io_arch="amd64", kubernetes_io_hostname="k8s-master-4.pxx.com", kubernetes_io_os="linux", namespace="default", persistentvolumeclaim="nextcloud-data"}
+```
 
+此时需要去掉一个，否则无法使用group_left(需要1：N来匹配）
+
+```
     - name: pod_disk_usage
       rules:
 
