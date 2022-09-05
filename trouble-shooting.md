@@ -92,14 +92,14 @@ mq-deadline 是适用于读优先于写，读多写少的情况，
 ## Tools
 - Networking && connections: `tcpdump`
 - system call: `strace`
-- resources: `top`, 'vmstat`, 'iostat`. 
+- resources: `top`, `vmstat`, 'iostat`. 
 - Web: `Google chrome F12, debug`
 - And so on
 
 ## Geneal guides
 
-- Manpage, 
-- log, 
+- Man page
+- log
 - monitoring
 - other approaches like googling, mailing list, github issue .etc.
 
