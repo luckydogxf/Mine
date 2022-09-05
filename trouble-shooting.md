@@ -50,7 +50,9 @@ to carelessness of  human being, and the prevention  is `strict procedure` or `S
 
    与此同时，还需要关注 time_wait， backlog, net.core.somaxconn 这2个queue等。
 
-    还遇到过其他同类的问题： Firewall的性能太差，经常出现cpu is 100%, 用户无法正常访问，只能替换掉。
+   还遇到过其他同类的问题： Firewall的性能太差，经常出现cpu is 100%, 用户无法正常访问，只能替换掉。
+   
+   Web层面，还可能出现 `HTTP 502/504`等情况，这是`backend`能力不足导致的，要具体分析解决。
 
 ---
 - 设置不当导致的故障
