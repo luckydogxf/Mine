@@ -57,7 +57,7 @@ to carelessness of  human being, and the prevention  is `strict procedure` or `S
 ---
 - 设置不当导致的故障
 
-于 IO scheduler 设置不当导致的用户使用体验不好。
+IO scheduler 设置不当导致的用户使用体验不好。
 
 某SAP 组件，用户读写比较平衡，并且运行在SAS Disk上，但是Linux的`io scheduler`却设为`mq-deadline` 导致用户写数据的时候，比较卡。
 
