@@ -86,6 +86,7 @@ mq-deadline 是适用于读优先于写，读多写少的情况，
    Database做升级后，创建database的时候，没有明确指定`character set`为`utf-8`, 那么就会使用默认的`latin-1`, 这样可能导致中文字符显示乱码等。
 ---
 - Unknown Bugs
+
    Dell 某个型号的服务器，intel 网卡驱动有Bug导致speed降级，用`ethtool`可以看到不正常，升级driver后解决问题。
 
 ## Tools
