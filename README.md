@@ -19,5 +19,6 @@ terraform.md            # terraform的经验总结
 
 cloudformation.md       # AWS Cloudformation使用总结
 
-ansible-playbook
+ansible-playbook        # roles of ansible playbook
+troule-shooting.md      # trouble-shooting examples and tips.
 ```
