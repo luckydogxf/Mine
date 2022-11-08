@@ -2,7 +2,7 @@ node('agent-pod') {
     stage('Clone') {
         echo "1.Clone Stage"
          credentialsId: 'whatever',
-         url: 'ssh://git@github.com/luckydogxf/Mine.git'
+         url: 'git@github.com/luckydogxf/Mine.git'
         script {
             build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
         }
