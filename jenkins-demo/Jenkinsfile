@@ -1,8 +1,7 @@
 node('agent-pod') {
     stage('Clone') {
-        echo "1.Clone Stage"
-         credentialsId: 'whatever',
-         url: 'ssh://github.com/luckydogxf/Mine.git'
+        // whatever is the ssh-key ID.
+       git(branch: "master", credentialsId: 'whatever', url: "git@github.com:luckydogxf/Mine.git")
         
         script {
             build_tag = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
@@ -13,7 +12,7 @@ node('agent-pod') {
     }
     stage('Build') {
         echo "3.Build Docker Image Stage"
-        sh "docker -H tcp://172.16.232.21:2375  build -t harbor.pacific-textiles.com/ops/hongquan-demo:${build_tag} ."
+        sh "cd jenkins-demo; docker -H tcp://172.16.232.21:2375  build -t harbor.pacific-textiles.com/ops/hongquan-demo:${build_tag} ."
     }
     stage('Push') {
         echo "4.Push Docker Image Stage"
