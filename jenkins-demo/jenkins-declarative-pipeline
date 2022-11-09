@@ -1,0 +1,146 @@
+pipeline {
+
+  agent {
+
+    //label "agent-pod"
+
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          labels:
+            hello: world
+        spec:
+          securityContext:
+            runAsUser: 1000 # default UID of jenkins user in agent image
+          containers:
+          - name: maven
+            image: 'maven:3.6-alpine'
+            command:
+              - cat
+            tty: true
+        '''
+    }
+  }
+
+    environment {
+        git_url     = "whatever-url"
+        remote_ip   = "192.168.1.6"
+        remote_dir  = "/opt/hello"
+        approvalMap = ''
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+        timeout(time: 10, unit: 'MINUTES')
+        timestamps()
+    }
+
+    parameters {
+        // AWS_ACCESS_KEY_ID     = credentials('jenkins-aws-secret-key-id')
+        string(name: 'branch', defaultValue: 'master', description: 'Branch Name,please')
+        choice(name: 'mode', choices: ['deploy', 'rollback'], description: 'blabal...！')
+    }
+
+
+    stages {
+
+        stage('Clone') {
+
+            steps {
+                 git(branch: "master", credentialsId: 'whatever', url: "git@github.com:jenkins-docs/simple-java-maven-app.git")
+
+               }
+           }
+
+        stage('Run maven') {
+
+              steps {
+                  container('maven') {
+
+                       sh 'mvn -B -DskipTests clean package'
+
+                     }
+
+               }
+          }
+
+     stage('Test') {
+
+              steps {
+
+                 container('maven') {
+
+                     sh 'mvn test'
+                }
+              }
+
+              post {
+                  always {
+
+                      container('maven') {
+                      junit 'target/surefire-reports/*.xml'
+
+                       }
+                 }
+              }
+          }
+
+    stage('pre deploy'){
+
+           steps{
+               script{
+                   approvalMap = input (
+                       message: '准备发布到哪个环境？',
+                       ok: '确定',
+                       parameters:[
+                           choice(name: 'ENV',choices: 'test\npre\nprod',description: '发布到什么环境？'),
+                           string(name: 'myparam',defaultValue: '',description: '')
+                       ],
+                       submitter: 'admin',
+                       submitterParameter: 'APPROVER'
+                   )
+               }
+           }
+
+     }
+
+    stage('Deploy to Production') {
+
+         //     when {
+         //         branch 'development'
+         //     }
+
+         when {
+             expression {
+                return "${approvalMap['ENV']}" == 'prod'
+             }
+         }
+         steps {
+
+               echo "deploy to production"
+               input message: 'Finished using the web site? (Click "Proceed" to continue)'
+
+               //under <Project>/jenkins/script/...
+              //  sh './jenkins/scripts/deliver-for-development.sh'
+
+             }
+         }
+
+    }
+
+     post{
+          always{
+              echo "========always========"
+          }
+          success{
+              echo "========pipeline executed successfully ========"
+          }
+          failure{
+              echo "========pipeline execution failed========"
+          }
+       }
+
+}
