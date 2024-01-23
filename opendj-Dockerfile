@@ -1,0 +1,46 @@
+From ubuntu:jammy
+
+LABEL opendj_version="7.4"
+
+ENV PORT=19389 \
+    VERSION=7.4 \
+    BASE_DN=${BASE_DN:-"dc=ptl,dc=hk"} \
+    ROOT_USER_DN=${ROOT_USER_DN:-"cn=administrator"} \
+    ROOT_PASSWORD=${ROOT_PASSWORD:-"password"} \
+    SECRET_VOLUME=${SECRET_VOLUME} \
+    OPENDJ_SSL_OPTIONS=${SSL_OPTIONS:-"--generateSelfSignedCertificate"} \
+    MASTER_SERVER=${MASTER_SERVER} \
+    OPENDJ_REPLICATION_TYPE=${OPENDJ_REPLICATION_TYPE} \
+    OPENDJ_USER="opendj" \
+    JAVA_JVM=${JAVA_JVM:-"4096m"}
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+    PATH="/opt/opendj/bin:$PATH"
+
+WORKDIR /opt
+
+RUN  apt-get update \
+ && apt-get install -y --no-install-recommends curl unzip openjdk-17-jdk \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd $OPENDJ_USER  \
+ && useradd -m -r -u 1001 -g $OPENDJ_USER $OPENDJ_USER
+
+# opendj-7.4.zip is ready.
+
+COPY --chown=$OPENDJ_USER:$OPENDJ_USER  opendj-$VERSION.zip  /opt/
+COPY --chown=$OPENDJ_USER:$OPENDJ_USER  run.sh entrypoint.sh /opt/opendj/
+
+RUN unzip opendj-$VERSION.zip \
+ && rm -r opendj-*.zip \
+ && chown -R $OPENDJ_USER:$OPENDJ_USER /opt/opendj \
+ && chmod -R g=u /opt/opendj \
+ && chmod +x /opt/opendj/run.sh /opt/opendj/entrypoint.sh
+
+
+EXPOSE 4444 19389 1636 8443 8989
+
+USER $OPENDJ_USER
+
+CMD ["bash"]
+
+ENTRYPOINT ["/opt/opendj/entrypoint.sh"]
